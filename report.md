@@ -1,237 +1,78 @@
 # Report
 
-_Complete this report by hand, using only the handwritten reference notes you prepared during the setup notebook. No laptop, internet, AI, or other resources may be used during the written hour._
+Submit **one set of handwritten answers per group** at 12:30. 
 
-## Questions
+Computers, phones, online resources and AI tools are not permitted. You may use only the handwritten notes prepared earlier in the session. **Show the formulas and reasoning that support your answers; numerical answers without an explanation will not receive full credit.**
 
-### Question 1 — Method of moments
+## Given model and numerical reference values
 
-#### 1.1
-
-Briefly explain which distributions you fit to $q$ and $h$, and why.
-
-#### 1.2
-
-Consider a Gumbel distribution for the discharge $q$, with probability density function
-
-$$f_Q(q)=\frac{1}{\beta}\exp\left[-\frac{q-\mu}{\beta}-\exp\left(-\frac{q-\mu}{\beta}\right)\right],\qquad \beta>0.$$
-
-For this distribution,
+The simplified Stefan model for ice thickness after a cold spell is
 
 $$
-E[Q] = \mu + \gamma\beta
+H_\mathrm{ice}=q(H_{\mathrm{ice},0},\Delta T)
+=\sqrt{\frac{2k_\mathrm{ice}}{\rho_\mathrm{ice}l}\,\Delta T\,\Delta t+H_{\mathrm{ice},0}^2},
+\qquad \frac{2k_\mathrm{ice}}{\rho_\mathrm{ice}l}=1.44\times10^{-8}\ \mathrm{m^2/(K\,s)}.
 $$
 
-and
+where $H_{\mathrm{ice},0}$ is the initial ice thickness, $\Delta t$ is the duration in seconds, and $\Delta T$ is the temperature deficit relative to the freezing point, in Kelvin. 
 
-$$
-\text{Var}(Q) = \frac{\pi^2}{6}\beta^2,
-$$
+Use $\Delta t=5\times24\times3600\ \mathrm{s}$, $\mu_{H_0}=0.20\ \mathrm{m}$, $\sigma_{H_0}=0.03\ \mathrm{m}$, $\mu_{\Delta T}=10\ \mathrm{K}$, and $\sigma_{\Delta T}=4\ \mathrm{K}$. Unless otherwise specified, the two inputs are independent. In the Monte Carlo simulation, negative draws of $\Delta T$ are set to zero (no further ice growth; melting is not modelled). The Taylor approximation is evaluated at the positive input means.
 
-where $\gamma\approx0.5772$ is the Euler--Mascheroni constant.
+The following are reference results from the notebook ($N=100000$, specified seed). Use them where relevant; answers should focus on the calculations and interpretation.
 
-Using the mean and standard deviation of $q$ from your handwritten reference notes:
+| Quantity | Independent inputs ($\rho=0$) | Correlated inputs ($\rho=0.5$) |
+|:--|--:|--:|
+| $q(\mu_{H_0},\mu_{\Delta T})$ [m] | 0.319700 | 0.319700 |
+| Second-order Taylor mean $\mu_H$ [m] | 0.318188 | 0.317046 |
+| First-order Taylor standard deviation $\sigma_H$ [m] | 0.043206 | 0.050962 |
+| Monte Carlo mean [m] | 0.318273 | 0.316976 |
+| Monte Carlo sample standard deviation [m] | 0.044155 | 0.052515 |
 
-1. Apply the method of moments by equating the theoretical mean and variance above to the sample mean and variance from your notes. Show your derivation.
-2. Compare your result with the fitted parameter values from the notebook.
-3. Briefly explain why the two estimation methods do not have to give exactly the same parameter values.
+For the independent-input simulation, the event $H_\mathrm{ice}<0.24\ \mathrm{m}$ has probability **0.04783** according to Monte Carlo and **0.03517** according to the Gaussian CDF with Taylor-propagated moments. Around **0.615%** of temperature-deficit draws were negative and set to zero.
 
+## Part 1 — Mean and variance propagation
 
-**Solution**
+**1.1** Derive the first-order partial derivatives $\partial q/\partial H_{\mathrm{ice},0}$ and $\partial q/\partial(\Delta T)$, and state the sign of each derivative at the given means.
 
-**1.1**
+**1.2** Derive the second-order partial derivatives $\partial^2q/\partial H_{\mathrm{ice},0}^2$ and $\partial^2q/\partial(\Delta T)^2$. Write the **second-order Taylor approximation of the mean** for independent inputs. Use the reference values to quantify the difference between this mean and $q$ evaluated at the mean inputs.
 
-For $h$, between a lognormal and a uniform pdf, the <b>Lognormal distribution</b> is the more plausible of the two candidates. The observed depths are strongly concentrated around approximately $3.4$ m rather than being spread uniformly between their minimum and maximum values. The observations also have a modest positive skewness, which a Lognormal distribution can represent whereas a Uniform distribution cannot.
+**1.3** Write the **first-order Taylor variance propagation formula** for independent inputs. Give the resulting standard deviation (in metres) using the provided numerical reference.
 
-For $q$, between a Gaussian and a Gumbel, the <b>Gumbel distribution</b> is the more plausible candidate. The discharge observations have a pronounced positive skewness and a clear right tail. A Gaussian distribution is symmetric, whereas the right-skewed Gumbel distribution can reproduce right tails.
+**1.4** Explain why evaluating the non-linear model at the input means need not equal the output expectation, and why the Taylor result is an approximation rather than an exact value.
 
-**1.2**
 
-For a Gumbel distribution,
+## Part 2 — Dependence between input variables
 
-$$
-\beta = \frac{\sqrt{6}}{\pi}\sigma
-$$
+Now assume the initial ice thickness and temperature deficit have a Pearson correlation coefficient $\rho=0.5$.
 
-and
+**2.1** State $\mathrm{Cov}(H_{\mathrm{ice},0},\Delta T)$ in terms of $\rho$, $\sigma_{H_0}$ and $\sigma_{\Delta T}$ and write the extra term in the **first-order output variance** compared with independent inputs. Is this term positive or negative? Justify using the derivatives from Part 1.
 
-$$
-\mu = \overline{q}-\gamma\beta,
-$$
+**2.2** Compare the Taylor standard deviations for $\rho=0$ and $\rho=0.5$. Explain physically why positive correlation has this effect on the propagated uncertainty. Does specifying the marginal distributions alone determine the output uncertainty?
 
-where $\gamma\approx0.5772$ is the Euler–Mascheroni constant.
 
-Using $\overline{q}\approx8.657$ m$^3$/s and $s_q\approx2.592$ m$^3$/s,
+## Part 3 — Lower-tail risk and Gaussian approximation 
 
-$$
-\beta \approx \frac{\sqrt{6}}{\pi}(2.592) \approx 2.021\ \mathrm{m^3/s},
-$$
+**3.1** For the event $H_\mathrm{ice}<0.24\ \mathrm{m}$, compare the Monte Carlo and Gaussian non-exceedance probabilities from the reference values. State which estimate is higher and calculate their **absolute difference in percentage points**.
 
-and
+**3.2** Give two specific reasons why a Gaussian PDF with Taylor-propagated moments need not describe the simulated output distribution exactly, even if its mean and standard deviation are similar.
 
-$$
-\mu \approx 8.657-0.5772(2.021) \approx 7.490\ \mathrm{m^3/s}.
-$$
+**3.3** Is agreement of the first two moments enough to validate a model for assessing exceptionally thin ice? Explain briefly.
 
-If we compare these values with the MLE location and scale copied from the notebook, we note that the estimates should be of similar magnitude, but they need not be identical: method of moments and maximum likelihood use different criteria to estimate the parameters. Agreement for this dataset does not imply that the two methods will always give similar estimates.
 
-> **General feedback**
->
-> There was some confusion generally about the goal of the 2 methods: a fitted distribution is defined by its parameters, which are calculated differently using MOM vs MLE; the fitted distributions themselves are not different in shape, etc.
+## Part 4 — Monte Carlo accuracy and model limitations
+**4.1** Compare the Monte Carlo and first-order Taylor standard deviations for independent inputs. Calculate their relative difference (using Monte Carlo as reference). Would increasing the number of Monte Carlo realizations $N$ necessarily eliminate this difference? Explain why or why not.
 
+**4.2** Identify **one limitation of the input distributions** and **one limitation of the physical growth model**. For each, propose a practical improvement.
 
----
 
-### Question 2 — Goodness of fit
 
-During Section 4 of the setup notebook you assessed the fitted distributions for $h$ and $q$ graphically with the help of exceedance probability plots. Sketch these distributions qualitatively.
+## How did things go? (Optional)
 
-For each variable, qualitatively describe how well your function fits the data. How is the fit in the tails, and what might be the consequences of differences in the tail behaviour?
+After the session, your group may share feedback with us (i.e. the teaching team) about the notebook and the written questions.
 
-Support your answer using specific evidence from the graphical checks recorded in your handwritten notes.
+> By Lotfi Massarweh and Sandra Verhagen, Delft University of Technology. CC BY 4.0, more info [on the Credits page of Workbook](https://mude.citg.tudelft.nl/workbook-2026/credits.html).
 
-
-**Solution**
-
-For $h$ (Lognormal) and  $q$ (Gumbel), both distributions have a reasonable fit over most of the curve, with small deviations (sometimes over-, sometimes under-estimating the empirical exceedance probability).
-
-At the most extreme observed values, both fitted exceedance curves lie above the empirical curves, so the models assign more probability to values at or beyond those extremes.
-
-> **General feedback**
->
-> In submissions the general plots and outcomes were correct but the interpretation was lacking, for example saying just "the fit was poor at the tails" instead of interpreting over/under-estimation of extremes
-
-
-### Question 3 — Contingency probabilities
-
-Choose **one** of the two raw contingency tables in your handwritten reference notes, **copy the raw data table into this report**, and use the same table throughout this question. Clearly state which variable pair you selected.
-
-#### 3.1
-
-Convert the raw counts in your table into **joint probabilities**. Show your calculation for one cell.
-
-#### 3.2
-
-Determine the **marginal probability distribution** of each variable. Show your calculation for one marginal value.
-
-#### 3.3
-
-Choose one category of one of the variables. Among the observations in that category, determine the **probability distribution of the other variable**. Show the calculations of how you obtained the probabilities and explain in words what this conditional distribution represents.
-
-#### 3.4
-
-Select one cell from the conditional distribution in part (c). Now reverse the conditioning direction and calculate the corresponding conditional probability for that cell. Compare the two conditional probabilities and explain why they are generally different. Under what conditions would they be identical?
-
-
-**Solution**
-
-The numerical answers depend on the contingency table selected by the group.
-
-For a table containing $n$ observations, each joint probability is the corresponding cell count divided by $n$:
-
-$$
-P(A_i,B_j)=\frac{n_{ij}}{n}.
-$$
-
-The marginal distributions are obtained by summing the joint probabilities over the other variable, or equivalently by dividing the row and column totals by $n$.
-
-For part (c), choosing a category $B$ means restricting attention to the observations in that category and normalizing the corresponding row or column. The resulting entries are
-
-$$
-P(A_i\mid B)=\frac{P(A_i,B)}{P(B)}.
-$$
-
-Their sum should equal 1. The verbal interpretation must make the conditioning direction clear: these are probabilities **among the observations satisfying $B$**, or **while keeping $B$ fixed**.
-
-For a selected category $A$, reversing the conditioning gives
-
-$$
-P(B\mid A)=\frac{P(A,B)}{P(A)}.
-$$
-
-The joint numerator is the same, but the denominator — and therefore the reference group — has changed. The two probabilities are consequently generally different.
-
-If $P(A,B)>0$, then
-
-$$
-\frac{P(A,B)}{P(B)}=\frac{P(A,B)}{P(A)}
-$$
-
-holds exactly when
-
-$$
-P(A)=P(B).
-$$
-
-
----
-
-### Question 4 — Cumulative probability
-
-Consider **one of the two marginal distributions** from the contingency table you used in Question 3.
-
-Would constructing a cumulative distribution function (CDF) for this variable give a meaningful probability description?
-
-Explain what property of a variable determines whether cumulative probabilities such as
-
-$$
-P(X\leq x)
-$$
-
-have a useful interpretation.
-
-
-**Solution**
-
-For the nominal categorical variables in the questionnaire, a CDF is generally not meaningful.
-
-A CDF is defined as
-
-$$
-F_X(x)=P(X\leq x),
-$$
-
-so the possible outcomes must have a meaningful ordering. This is true for numerical variables and can also be true for ordinal categorical variables.
-
-For nominal categories there is no natural meaning to one category being "less than" another. Any cumulative probability would therefore depend on an arbitrary ordering of the categories rather than on a meaningful property of the variable.
-
-> **General feedback**
->
-> Many groups said variables need to be numerical or continuous to create CDFs which is not true: categorical variables which are ordered (ordinal variables) can still be used to create meaningful CDFs.
-
-
----
-
-### Question 5 — Modelling assumptions
-
-Compare the two correlation coefficients in your handwritten reference notes, $\rho_{obs}$ and $\rho_{sim}$.
-
-#### 5.1
-What do these results tell you about the assumption made when $h$ and $q$ were sampled in the Monte Carlo simulation?
-
-#### 5.2
-Does your Monte Carlo simulation generate realistic samples for the simulation of $u=\frac{q}{wh}$? Justify your choice.
-
-
-**Solution**
-
-**a.** The independently generated samples should have a correlation close to zero, because the simulation draws $h$ and $q$ independently. The paired observations show a clear non-zero relationship between water depth and discharge. The comparison therefore indicates that independence does not reproduce an important feature of the observed joint behaviour.
-
-**b.** No, not always. Both variables should be positively correlated. However, since $q$ and $h$ were sampled independently, the sampling can create combinations of high $q$ and low $h$, or vice versa, which occur more readily under independent sampling than suggested by the observed joint relationship.
-
-
----
-
-### Last Question: How did things go? (Optional)
-
-_Use this space to let us know if you ran into any challenges while working on this GA, and if you have any feedback to report._
-
-**End of file.**
-
-> By Max Ramgraber, Patricia Mares Nasarre and Robert Lanzafame, Delft University of Technology. CC BY 4.0, more info [on the Credits page of Workbook](https://mude.citg.tudelft.nl/workbook-2026/credits.html).
-
-
-```{custom_download_link} ./all_files_GA_1_4.zip
+```{custom_download_link} ./all_files_GA_1_6.zip
 :text: ".zip assignment"
 :replace_default: "True"
 ```
