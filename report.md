@@ -2,93 +2,76 @@
 
 Answer the following questions based on the analyses performed in the notebook and the notes you made. Explain your reasoning clearly. No Python code is required.
 
-## Background and key results
+## Background
 
-The farmer's peat parcel is observed with two independent techniques: **InSAR** (average height change of the whole parcel, every 6 days, $\sigma_{\text{InSAR}} = 3$ mm) and an **extensometer** (height change at one point, daily, $\sigma_{\text{ext}} = 8$ mm). Two functional models were estimated with BLUE:
+The farmer's peat parcel is observed with **InSAR** ($m = 145$, $\sigma_{\text{InSAR}} = 3$ mm, average of the whole parcel) and an **extensometer** ($m = 1461$, $\sigma_{\text{ext}} = 8$ mm, one point in the parcel). The observations are independent and normally distributed. Last week (GA1.7) we fixed the memory timescale of the soil at $\tau = 10$ days. This week $\tau$ is estimated as an extra unknown:
 
-- **Model 1** (offset + velocity): $d(t) = d_0 + v\,t$, with $t$ in years since 1 January 2020.
-- **Model 2** (weather model): $d(t) = d_0 + x_I\,D(t) + k\,S_{10}(t)$, with $D(t)$ the number of dry days and $S_{10}(t)$ the water surplus with $\tau = 10$ days.
+$$
+q(x) = d_0 + x_I D(t) + k S_\tau(t),
+\qquad
+S_i = a S_{i-1} + (P_i - E_i), \quad a = e^{-1/\tau}, \quad S_{-1} = 0,
+$$
 
-You may use the following results obtained in the notebook (estimate $\pm$ standard deviation):
+with unknowns $x = [d_0,\ x_I,\ k,\ \tau]^T$. The model is solved with Gauss-Newton, starting from $x_{[0]} = [5\ \text{mm},\ -0.04\ \text{mm/dry day},\ 0.4,\ 20\ \text{days}]$.
 
-| | InSAR ($m = 145$) | Extensometer ($m = 1461$) |
-|---|---|---|
-| **Model 1:** $\hat{d}_0$ [mm] | $6.0 \pm 0.5$ | $2.4 \pm 0.4$ |
-| **Model 1:** $\hat{v}$ [mm/yr] | $-5.37 \pm 0.21$ | $-7.95 \pm 0.18$ |
-| **Model 1:** std of residuals [mm] | $11.5$ | $16.9$ |
-| **Model 2:** $\hat{d}_0$ [mm] | $7.7 \pm 0.7$ | $5.8 \pm 0.6$ |
-| **Model 2:** $\hat{x}_I$ [mm/dry day] | $-0.0422 \pm 0.0016$ | $-0.0613 \pm 0.0014$ |
-| **Model 2:** $\hat{k}$ [-] | $0.463 \pm 0.012$ | $0.684 \pm 0.011$ |
-| **Model 2:** std of residuals [mm] | $5.7$ | $9.9$ |
+You may use the following results of the overall model test (OMT) for the model with $\tau$ estimated, obtained in the notebook with $\alpha = 0.05$:
 
-On average, the parcel has $N_{\text{dry}} \approx 131$ dry days per year in the observation period (2020–2023).
+| | $T$ | $k_\alpha$ | $r$ | std of residuals [mm] |
+|---|---|---|---|---|
+| InSAR | $113.1$ | $169.7$ | $141$ | $2.65$ |
+| Extensometer | $1516.5$ | $1546.9$ | $1457$ | $8.15$ |
 
 ---
 
-## Question 1: Functional and stochastic model
+## Question 1: Non-linear model and linearization
 
-**a)** For Model 1, write the observation equations in matrix form $\mathbb{E}(Y) = A\,x$ (no numerical values needed, use $t_1, t_2, \dots$). You do not need to write out the whole matrix. State the units of the unknowns.
-
-
-**b)** Sketch the structure of the covariance matrix $\Sigma_Y$ for the InSAR observations. State the dimension of the matrix. You do not need to write out the whole matrix.
-
-How is the assumption that the observations are independent included?
+**a)** The model is linear in $d_0$, $x_I$ and $k$, but non-linear in $\tau$. Explain why, and why we can no longer write the model as $\mathbb{E}(Y) = A x$ and solve it directly with BLUE.
 
 
-**c)** Write down the BLU estimator $\hat{X}$ and its covariance matrix $\Sigma_{\hat{X}}$. BLUE is a special case of weighted least-squares. Which weight matrix $W$ does BLUE use, and why does a more precise observation receive more weight?
+**b)** Gauss-Newton uses the Jacobian matrix $J$ as the design matrix $A$.
+- Sketch the structure of $J$ for this model (e.g., show what is on the first and last rows): what does each column contain? You may write $\dfrac{\partial S_\tau}{\partial \tau}$ without working it out.
+- Which columns of $J$ change from one Gauss-Newton iteration to the next? Explain why.
 
 
 ---
 
-## Question 2: Results of Model 1 (offset + velocity)
+## Question 2: Initial values and convergence
+
+**a)** Why does Gauss-Newton need initial values, and why is it important that they are reasonably good? Give two things that can go wrong with bad initial values.
 
 
-**a)** Precision of the observations and of the estimates:
-- Which sensor gives the more precise individual observations?
-- Which sensor gives the more precise estimate of the velocity $v$?
-- Does this make sense? Explain the relation between the precision of an estimated parameter and the number of observations. Use the redundancy of both datasets in your answer.
+**b)** The figure shows the convergence of the four parameters for InSAR.
 
+![Convergence of Gauss-Newton for InSAR](https://github.com/TUDelft-MUDE/source-files/raw/main/file/GA1.8/convergence_insar.png)
 
-**b)** Compare the estimated velocities of InSAR and the extensometer. Do you think the difference is significant, given their standard deviations? Give a possible explanation.
-
-
-**c)** The figure below shows the observations, the fitted Model 1 and the 98% confidence interval of $\hat{Y}$ for both sensors.
-
-![Model 1: observations, fitted model and 98% confidence interval](https://github.com/TUDelft-MUDE/source-files/raw/main/file/GA1.7/GA1.7_model1_fit.png)
-
-The 98% confidence interval of $\hat{Y}$ is very narrow, but many observations lie far outside it. Does this mean the confidence interval is computed wrongly? Explain what the confidence interval of $\hat{Y}$ represents, and why this is not a contradiction.
-
-
-**d)** Using the figure in 2c, sketch the residuals of Model 1 for the extensometer as a function of time. The standard deviation of the extensometer residuals is $16.9$ mm, while $\sigma_{\text{ext}} = 8$ mm. What does this tell you about Model 1?
+Describe the convergence. How many iterations are needed?
 
 
 ---
 
-## Question 3: Model 2 (weather model)
+## Question 3: Overall model test
+
+**a)** Formulate the null hypothesis of the overall model test (OMT). Give the test statistic $T$ and its distribution under $H_0$. When is $H_0$ rejected?
 
 
-**a)** Explain the physical meaning and the sign of the estimated parameters $\hat{x}_I$ and $\hat{k}$.
+**b)** Sketch the PDF of the test statistic for InSAR with $\tau$ estimated ($r = 141$). Indicate in your sketch:
+
+- the critical value $k_\alpha$ and the rejection region ($\alpha = 0.05$);
+- the test statistic $T$ for InSAR.
 
 
-**b)** Convert $\hat{x}_I$ for InSAR to a subsidence rate in mm/yr and compare it with the velocity $\hat{v}$ of Model 1. Also convert the standard deviation. What is the difference in interpretation between the two models?
+**c)** Interpret the OMT results for both sensors. Compare $T$ with $k_\alpha$ and with the redundancy $r$. Does accepting $H_0$ prove that the model is correct?
 
 
 ---
 
-## Question 4: Model comparison and advice to the farmer
+## Question 4: Comparing models
 
-The figure below shows the residuals of Model 2 for the extensometer as a function of time (left) and the histogram of the normalized residuals $\hat{\epsilon}/\sigma$ together with the standard normal distribution $N(0,1)$ (right).
-
-![Extensometer Model 2: residuals and normalized residuals](https://github.com/TUDelft-MUDE/source-files/raw/main/file/GA1.7/GA1.7_model2_residuals.png)
-
-**a)** Compare the residuals of Model 2 in the figure with your sketch of the Model 1 residuals from Question 2d. Look at the size of the residuals (see also the std of the residuals in the table) and the pattern in time. Explain why Model 2 describes the data better.
-
-
-**b)** Model 2 is better, but is it "correct"? Use the figure (residuals and histogram) and the table (**compare the std of the residuals with $\sigma$ for both sensors**) to argue whether the model is complete, and suggest one way to improve it.
+**a)** This week we added one unknown ($\tau$) to last week's model. In general, how does adding unknowns affect the redundancy $r$, the test statistic $T$ and the critical value $k_\alpha$? Explain why.
 
 
 
-**c)** Write a short advice (3–4 sentences) to the farmer: is his parcel sinking, how fast, and what is driving it? Which dataset would you use to describe the parcel as a whole?
+**b)** Assume that last week's model ($\tau$ fixed at 10 days) was tested first and rejected by the OMT. Which other test could you use to check whether the new model ($\tau$ estimated) is significantly better? Give its test statistic.
 
 
 ---
@@ -97,9 +80,9 @@ The figure below shows the residuals of Model 2 for the extensometer as a functi
 
 Use this space to let us know if you ran into any challenges while working on this GA, and if you have any feedback to report.
 
-> By Lina Hagenah and Isabel Slingerland, Delft University of Technology. CC BY 4.0, more info [on the Credits page of Workbook](https://mude.citg.tudelft.nl/workbook-2026/credits.html).
+> By Lina Hagenah, Delft University of Technology. CC BY 4.0, more info [on the Credits page of Workbook](https://mude.citg.tudelft.nl/workbook-2026/credits.html).
 
-```{custom_download_link} ./all_files_GA_1_7.zip
+```{custom_download_link} ./all_files_GA_1_8.zip
 :text: ".zip assignment"
 :replace_default: "True"
 ```

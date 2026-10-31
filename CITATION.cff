@@ -2,15 +2,17 @@ cff-version: 1.2.0
 message: 'If you use this assignment, please cite it using these metadata.'
 authors:
   - name: Delft University of Technology
-title: 'MUDE assignment 2026-2027: group assignment 1.7'
+title: 'MUDE assignment 2026-2027: group assignment 1.8'
 preferred-citation:
   type: generic
   authors:
   - family-names: Slingerland
     given-names: Isabel
-  - name: Delft University of Technology
-  url: 'https://github.com/MUDE-2026/GA1.7' 
-  title: 'MUDE assignment 2026-2027: group assignment 1.7'
+  - family-names: Hagenah
+    given-names: Lina
+  name: Delft University of Technology
+  url: 'https://github.com/MUDE-2026/GA1.8' 
+  title: 'MUDE assignment 2026-2027: group assignment 1.8'
   license: CC-BY-4.0
   license-url: 'https://creativecommons.org/licenses/by/4.0/'
   languages:
