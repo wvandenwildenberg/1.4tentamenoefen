@@ -1,34 +1,20 @@
-# Group assignment 1.4: Go with the flow
+# Group assignment 1.6: Icy Dicey Propagation
 
-You can preview the instructions of this assignment on https://mude.citg.tudelft.nl/workbook-2026/assignments/GA1.4/README.html. After the deadline, this link will include solutions. The preview without solutions will remain available here: https://mude.citg.tudelft.nl/workbook-2026/no_solutions/assignments/GA1.4/README.html. All files of an assignment can be downloaded as [.zip-file](https://mude.citg.tudelft.nl/workbook-2026/_custom_downloads/assignments/GA1.4/all_files_GA_1_4.zip) to your computer.
+An ice layer grows during a cold spell. How reliable is a prediction of its thickness after five days? You will use the Stefan ice-growth model to compare the uncertainty predicted by Taylor approximations with uncertainty obtained by Monte Carlo simulation.
 
-At 11:30, you'll have to close laptops and receive a set of questions to be solved as a group. These questions are based on what you did in the first three hours. You can make use of notes written in the first three hours, but you are not allowed to use any other resources like AI. At 12:30, you'll hand in your handwritten answers to the questions.
+You can preview this assignment in the [MUDE 2026 workbook](https://mude.citg.tudelft.nl/workbook-2026/assignments/GA1.6/README.html). The [version without solutions](https://mude.citg.tudelft.nl/workbook-2026/no_solutions/assignments/GA1.6/README.html) remains available. The workbook also provides a ZIP download of the assignment files.
 
-Before you can start this assignment, you should have read the theory in the book, completed the Wednesday's workshop and the programming assignment of this week.
+**Friday group session:** during the first three hours, work through the [ice-growth notebook](./icey_dicey.ipynb) together and prepare handwritten reference notes. **At 11:30, close all laptops.** Your group will receive a separate set of questions to answer **by hand, without computers or other resources (including AI tools)**. You may consult the handwritten notes prepared during the first three hours. **Hand in your group's handwritten answers at 12:30.**
 
-There are four files to be aware of:
+Before the session, read the [uncertainty propagation chapter](https://mude.citg.tudelft.nl/book/2026/propagation_uncertainty/overview.html), complete [Wednesday's workshop (Pipe Dreams)](https://mude.citg.tudelft.nl/workbook-2026/assignments/WS1.6/README.html) and the [programming assignment](https://mude.citg.tudelft.nl/workbook-2026/assignments/PA1.6/README.html).
 
-1. `README.md`
-2. `GA_1.4.ipynb`
-3. `dataset_thames.csv`
-4. `dataset_class_survey_contingency.csv`
+You will practice second-order mean propagation, first-order variance propagation, sampling a non-linear model, interpreting CDFs and checking the influence of input correlation. The written questions assess your mathematical reasoning and interpretation of your results, not your ability to recall Python syntax.
 
-With the notebook you will:
+**Files:** [icey_dicey.ipynb](./icey_dicey.ipynb) (preparation and numerical analysis) and `report.md` (the one-hour written questions, distributed when laptops close). The report is deliberately not included in the initial student download; teachers will provide it at 11:30.
 
-- explore measurements of water depth and discharge;
-- select and fit probability distributions;
-- assess their goodness of fit;
-- propagate uncertainty to flow velocity;
-- investigate an assumption made in that propagation;
-- explore categorical questionnaire data using contingency tables.
+> By Lotfi Massarweh and Sandra Verhagen, Delft University of Technology. CC BY 4.0, more info [on the Credits page of Workbook](https://mude.citg.tudelft.nl/workbook-2026/credits.html).
 
-The written part asks you to use and interpret the results you obtained during the notebook. Section 8 of the notebook contains a checklist of what should be present in your handwritten reference notes before laptops close.
-
-Many notebook tasks can be divided among group members, but make sure that the whole group comes back together to inspect and discuss the results. The written questions primarily assess your interpretation of the analysis rather than your ability to produce Python code.
-
-> By Max Ramgraber, Patricia Mares Nasarre and Robert Lanzafame, Delft University of Technology. CC BY 4.0, more info [on the Credits page of Workbook](https://mude.citg.tudelft.nl/workbook-2026/credits.html).
-
-```{custom_download_link} ./all_files_GA_1_4.zip
+```{custom_download_link} ./all_files_GA_1_6.zip
 :text: ".zip assignment"
 :replace_default: "True"
 ```

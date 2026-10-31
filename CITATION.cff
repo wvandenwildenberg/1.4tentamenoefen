@@ -2,19 +2,20 @@ cff-version: 1.2.0
 message: 'If you use this assignment, please cite it using these metadata.'
 authors:
   - name: Delft University of Technology
-title: 'MUDE assignment 2026-2027: <programming/workshop/group assignment> <x.x>'
+title: 'MUDE assignment 2026-2027: Group assignment 1.6 — Icy Dicey Propagation'
 preferred-citation:
   type: generic
   authors:
-  - family-names: <...>
-    given-names: <...>
-  - name: Delft University of Technology
-  url: 'https://github.com/MUDE-2026/<PA/WS/GA>x.x' 
-  title: 'MUDE assignment 2026-2027: <programming/workshop/group assignment> <x.x>'
+    - family-names: Massarweh
+      given-names: Lotfi
+    - family-names: Verhagen
+      given-names: Sandra
+  url: 'https://github.com/MUDE-2026/GA1.6'
+  title: 'MUDE assignment 2026-2027: Group assignment 1.6 — Icy Dicey Propagation'
   license: CC-BY-4.0
   license-url: 'https://creativecommons.org/licenses/by/4.0/'
   languages:
     - en
   contact:
-  - email: MUDE-CEG@tudelft.nl
-    name: 'MUDE teaching team from Delft University of Technology'
+    - email: MUDE-CEG@tudelft.nl
+      name: 'MUDE teaching team from Delft University of Technology'
